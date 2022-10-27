@@ -250,24 +250,22 @@ func makeValidUri(filePath: String) -> String {
 
     func  makeVideoBitrate(originalHeight:Int,originalWidth:Int,originalBitrate:Int,height:Int,width:Int)->Int {
         let compressFactor:Float = 0.8
-        let  minCompressFactor:Float = 0.8
+        let minCompressFactor:Float = 0.8
         let maxBitrate:Int = 1669000
-        let minValue:Float=min(Float(originalHeight)/Float(height),Float(originalWidth)/Float(width))
-        var remeasuredBitrate:Int = Int(Float(originalBitrate) / minValue)
-        remeasuredBitrate = Int(Float(remeasuredBitrate)*compressFactor)
-        let minBitrate:Int = self.getVideoBitrateWithFactor(f: minCompressFactor) / (1280 * 720 / (width * height))
+        let minValue:Float = min(Float(originalHeight)/Float(height),Float(originalWidth)/Float(width))
+        let remeasuredBitrate:Int = Int(Float(originalBitrate) / minValue * compressFactor)
+        let minBitrate = Int(self.getVideoBitrateWithFactor(f: minCompressFactor) / (1280 * 720 / Float(width * height)))
         if (originalBitrate < minBitrate) {
-          return remeasuredBitrate;
+            return remeasuredBitrate;
         }
         if (remeasuredBitrate > maxBitrate) {
-          return maxBitrate;
+            return maxBitrate;
         }
         return max(remeasuredBitrate, minBitrate);
-      }
-    func getVideoBitrateWithFactor(f:Float)->Int {
-        return Int(f * 2000 * 1000 * 1.13);
-      }
-    
+    }
+    func getVideoBitrateWithFactor(f:Float)->Float {
+        return f * 2000 * 1000 * 1.13;
+    }
     func autoCompressionHelper(url: URL, options: [String: Any], onProgress: @escaping (Float) -> Void,  onCompletion: @escaping (URL) -> Void, onFailure: @escaping (Error) -> Void){
         let maxSize:Float = options["maxSize"] as! Float;
         let uuid:String = options["uuid"] as! String
